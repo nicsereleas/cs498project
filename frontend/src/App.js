@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
+import "./Calendar.css";
+import "./Form.css";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -34,25 +38,43 @@ function CalendarPage() {
   }
 
   return (
-    <div className="calendar-container">
-      <h1>
-        {today.toLocaleString("default", { month: "long" })} {year}
-      </h1>
-      <div className="weekdays">
-        {daysOfWeek.map((d) => (
-          <div key={d} className="weekday">{d}</div>
-        ))}
+    <>
+      <div className="top-container">
+        <h2 className="chores">Here are the chores</h2>
+        <h2 className="bills">Here are the bills</h2>
+        <h3 className="top-link"><Link to="/form">
+            <button className="nav-button">Add a Bill or Chore</button>
+          </Link>
+          </h3>
       </div>
-      <div className="calendar-grid">{calendarDays}</div>
-      <Link to="/form">
-        <button className="nav-button">Go to Form</button>
-      </Link>
-    </div>
+      <div className="bottom-container">
+        <div className="calendar-container">
+          <h2>
+            {today.toLocaleString("default", { month: "long" })} {year}
+          </h2>
+          <div className="weekdays">
+            {daysOfWeek.map((d) => (
+              <div key={d} className="weekday">{d}</div>
+            ))}
+          </div>
+          <div className="calendar-grid">{calendarDays}</div>
+        </div>
+
+        <div className="right-container">
+          <h2>Right Container</h2>
+          <p>This takes up the rest of the screen and matches the calendar height.</p>
+        </div>
+      </div>
+    </>
   );
 }
 
+
+
+
 function FormPage() {
   return (
+    <body>
     <div className="form-container">
       <h1>Sample Form</h1>
       <form>
@@ -74,6 +96,7 @@ function FormPage() {
         <button className="nav-button">Back to Calendar</button>
       </Link>
     </div>
+    </body>
   );
 }
 
