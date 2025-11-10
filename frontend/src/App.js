@@ -7,7 +7,6 @@ import "./Form.css";
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 
-
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -61,8 +60,7 @@ function CalendarPage() {
         </div>
 
         <div className="right-container">
-          <h2>Right Container</h2>
-          <p>This takes up the rest of the screen and matches the calendar height.</p>
+          <h4>Here is what you have coming up in the next 7 days:</h4>
         </div>
       </div>
     </>
@@ -70,27 +68,33 @@ function CalendarPage() {
 }
 
 
-
-
 function FormPage() {
   return (
-    <body>
+    <body style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
     <div className="form-container">
       <h1>Sample Form</h1>
       <form>
         <label>
+          Chore or Bill:
+          <select defaultValue="" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}>
+            <option value="" disabled>
+            </option>
+            <option value="chore">Chore</option>
+            <option value="bill">Bill</option>
+          </select>
+        </label>
+        <label>
           Name:
-          <input type="text" placeholder="Enter your name" />
+          <input type="email" placeholder="Name of Bill/Chore" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} />
         </label>
+        
         <label>
-          Email:
-          <input type="email" placeholder="Enter your email" />
+          Notes:
+          <textarea placeholder="Anything you want to add" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}></textarea>
         </label>
-        <label>
-          Feedback:
-          <textarea placeholder="Your feedback here"></textarea>
-        </label>
+        <Link to="/form">
         <button type="submit">Submit</button>
+        </Link>
       </form>
       <Link to="/">
         <button className="nav-button">Back to Calendar</button>
