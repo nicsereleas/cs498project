@@ -87,7 +87,7 @@ function FormPage() {
           Name:
           <input type="email" placeholder="Name of Bill/Chore" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }} />
         </label>
-
+        
         <label>
           Notes:
           <textarea placeholder="Anything you want to add" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}></textarea>
