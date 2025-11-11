@@ -71,6 +71,7 @@ function CalendarPage() {
 function FormPage() {
   const [type, setType] = useState("");
   const [name, setName] = useState("");
+  const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
 
     const handleSubmit = async (e) => {
@@ -93,6 +94,7 @@ function FormPage() {
       setType("");
       setName("");
       setNotes("");
+      setDate("");
 
     } catch (error) {
       console.error(error);
@@ -123,7 +125,13 @@ function FormPage() {
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </label>
-
+        <label>
+          Due Date:
+          <input
+          type="date"
+          style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
+        </label>
         <label>
           Notes:
           <textarea
