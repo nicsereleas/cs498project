@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import "./Calendar.css";
 import "./Form.css";
 
+const API_BASE = "http://localhost:5000/api"; 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
+  const [chores, setChores] = useState([]);
+  const [bills, setBills] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
 
   const today = new Date();
   const year = today.getFullYear();
@@ -18,12 +22,37 @@ function CalendarPage() {
 
   const handleClick = (day) => setSelectedDate(day);
 
-  const calendarDays = [];
+  // Fetch data for dashboard
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [choresRes, billsRes, upcomingRes] = await Promise.all([
+          fetch(`${API_BASE}/chores`),
+          fetch(`${API_BASE}/bills`),
+          fetch(`${API_BASE}/dashboard/upcoming`)
+        ]);
 
+        
+      const choresData = await choresRes.json();
+      const billsData = await billsRes.json();
+      const upcomingData = await upcomingRes.json();
+
+      setChores(Array.isArray(choresData) ? choresData : []);
+      setBills(Array.isArray(billsData) ? billsData : []);
+      setUpcoming(Array.isArray(upcomingData) ? upcomingData : []);
+
+      } catch (err) {
+        console.error("Error fetching dashboard data:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  // Render days
+  const calendarDays = [];
   for (let i = 0; i < firstDay; i++) {
     calendarDays.push(<div key={`empty-${i}`} className="day empty"></div>);
   }
-
   for (let day = 1; day <= daysInMonth; day++) {
     calendarDays.push(
       <div
@@ -39,13 +68,15 @@ function CalendarPage() {
   return (
     <>
       <div className="top-container">
-        <h2 className="chores">Chores Left:</h2>
-        <h2 className="bills">Bills Left:</h2>
-        <h3 className="top-link"><Link to="/form">
-            <button className="nav-button">Add a Bill or Chore</button>
+        <h2 className="chores">Chores Left: {chores.length}</h2>
+        <h2 className="bills">Bills Left: {bills.length}</h2>
+        <h3 className="top-link">
+          <Link to="/form">
+            <button className="nav-button">Add a Bill, Chore, or Roommate</button>
           </Link>
-          </h3>
+        </h3>
       </div>
+
       <div className="bottom-container">
         <div className="calendar-container">
           <h2>
@@ -60,7 +91,12 @@ function CalendarPage() {
         </div>
 
         <div className="right-container">
-          <h4>Here is what you have coming up in the next 7 days:</h4>
+          <h4>Here’s what you have coming up in the next 7 days:</h4>
+          <ul>
+            {upcoming.map((item, i) => (
+              <li key={i}>{item.description || item.name}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </>
@@ -69,79 +105,179 @@ function CalendarPage() {
 
 
 function FormPage() {
-  const [type, setType] = useState("");
-  const [name, setName] = useState("");
-  const [notes, setNotes] = useState("");
+  const [formType, setFormType] = useState("");
+  const [formData, setFormData] = useState({});
 
-    const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    const data = { type, name, notes };
-
-    try {
-      const response = await fetch("http://your-api-url.com/submit", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to submit");
-      }
-
-      console.log("Submitted:", data);
-      setType("");
-      setName("");
-      setNotes("");
-
-    } catch (error) {
-      console.error(error);
-      alert("Error submitting form");
-    }
+  const handleChange = (e) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
-  return (
-    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-    <div className="form-container">
-      <h1>Sample Form</h1>
-      <form>
-        <label>
-          Chore or Bill:
-          <select defaultValue="" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}>
-            <option value="" disabled>Select Bill or Chore
-            </option>
-            <option value="chore">Chore</option>
-            <option value="bill">Bill</option>
-          </select>
-        </label>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={name}
-            placeholder="Name of Bill/Chore"
-            onChange={(e) => setName(e.target.value)}
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </label>
 
-        <label>
-          Notes:
-          <textarea
-            value={notes}
-            placeholder="Anything you want to add"
-            onChange={(e) => setNotes(e.target.value)}
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-      <Link to="/">
-        <button className="nav-button">Back to Calendar</button>
-      </Link>
-    </div>
+  const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    let data = {};
+
+    if (formType === "bill") {
+      data = {
+        description: formData.description,
+        amount: Number(formData.amount),
+        dueDate: formData.dueDate,
+      };
+    } else if (formType === "roommate") {
+      data = {
+        name: formData.name,
+        email: formData.email,
+      };
+    } else if (formType === "chore") {
+      data = {
+        name: formData.name,
+        assignedTo: formData.assignedTo?.split(",").map(s => s.trim()) || [],
+        dueDate: formData.dueDate,
+      };
+    }
+
+    const response = await fetch(`${API_BASE}/${formType}s`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error("Server error:", result);
+      throw new Error(result.message || "Failed to submit");
+    }
+
+    alert(`${formType} added successfully!`);
+    setFormType("");
+    setFormData({});
+  } catch (error) {
+    console.error(error);
+    alert("Error submitting form: " + error.message);
+  }
+};
+
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div className="form-container">
+        <h1>Add Data</h1>
+
+        <form onSubmit={handleSubmit}>
+          <label>
+            What do you want to add?
+            <select
+              name="type"
+              value={formType}
+              onChange={(e) => setFormType(e.target.value)}
+              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+              required
+            >
+              <option value="">Select Type</option>
+              <option value="roommate">Roommate</option>
+              <option value="bill">Bill</option>
+              <option value="chore">Chore</option>
+            </select>
+          </label>
+
+          {formType === "roommate" && (
+            <>
+              <label>
+                Name:
+                <input name="name" value={formData.name || ""} onChange={handleChange} required />
+              </label>
+              <label>
+                Email:
+                <input
+                  name="email"
+                  type="email"
+                  value={formData.email || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </>
+          )}
+
+          {formType === "bill" && (
+            <>
+              <label>
+                Description:
+                <input
+                  name="description"
+                  value={formData.description || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+              <label>
+                Amount:
+                <input
+                  name="amount"
+                  type="number"
+                  value={formData.amount || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+              <label>
+                Due Date:
+                <input
+                  name="dueDate"
+                  type="date"
+                  value={formData.dueDate || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </>
+          )}
+
+          {formType === "chore" && (
+            <>
+              <label>
+                Name:
+                <input
+                  name="name"
+                  value={formData.name || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+              <label>
+                Assigned To (comma-separated IDs):
+                <input
+                  name="assignedTo"
+                  value={formData.assignedTo || ""}
+                  onChange={handleChange}
+                />
+              </label>
+              <label>
+                Due Date:
+                <input
+                  name="dueDate"
+                  type="date"
+                  value={formData.dueDate || ""}
+                  onChange={handleChange}
+                  required
+                />
+              </label>
+            </>
+          )}
+
+          <button type="submit" className="nav-button">Submit</button>
+        </form>
+
+        <Link to="/">
+          <button className="nav-button">Back to Calendar</button>
+        </Link>
+      </div>
     </div>
   );
 }
+
 
 function App() {
   return (
