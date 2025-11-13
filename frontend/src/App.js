@@ -7,7 +7,6 @@ import "./Form.css";
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 
-
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -40,8 +39,8 @@ function CalendarPage() {
   return (
     <>
       <div className="top-container">
-        <h2 className="chores">Here are the chores</h2>
-        <h2 className="bills">Here are the bills</h2>
+        <h2 className="chores">Chores Left:</h2>
+        <h2 className="bills">Bills Left:</h2>
         <h3 className="top-link"><Link to="/form">
             <button className="nav-button">Add a Bill or Chore</button>
           </Link>
@@ -61,8 +60,7 @@ function CalendarPage() {
         </div>
 
         <div className="right-container">
-          <h2>Right Container</h2>
-          <p>This takes up the rest of the screen and matches the calendar height.</p>
+          <h4>Here is what you have coming up in the next 7 days:</h4>
         </div>
       </div>
     </>
@@ -70,25 +68,70 @@ function CalendarPage() {
 }
 
 
-
-
 function FormPage() {
+  const [type, setType] = useState("");
+  const [name, setName] = useState("");
+  const [notes, setNotes] = useState("");
+
+    const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const data = { type, name, notes };
+
+    try {
+      const response = await fetch("http://your-api-url.com/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to submit");
+      }
+
+      console.log("Submitted:", data);
+      setType("");
+      setName("");
+      setNotes("");
+
+    } catch (error) {
+      console.error(error);
+      alert("Error submitting form");
+    }
+  };
   return (
-    <body>
+    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
     <div className="form-container">
       <h1>Sample Form</h1>
       <form>
         <label>
+          Chore or Bill:
+          <select defaultValue="" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}>
+            <option value="" disabled>Select Bill or Chore
+            </option>
+            <option value="chore">Chore</option>
+            <option value="bill">Bill</option>
+          </select>
+        </label>
+        <label>
           Name:
-          <input type="text" placeholder="Enter your name" />
+          <input
+            type="text"
+            value={name}
+            placeholder="Name of Bill/Chore"
+            onChange={(e) => setName(e.target.value)}
+            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
         </label>
+
         <label>
-          Email:
-          <input type="email" placeholder="Enter your email" />
-        </label>
-        <label>
-          Feedback:
-          <textarea placeholder="Your feedback here"></textarea>
+          Notes:
+          <textarea
+            value={notes}
+            placeholder="Anything you want to add"
+            onChange={(e) => setNotes(e.target.value)}
+            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
         </label>
         <button type="submit">Submit</button>
       </form>
@@ -96,7 +139,7 @@ function FormPage() {
         <button className="nav-button">Back to Calendar</button>
       </Link>
     </div>
-    </body>
+    </div>
   );
 }
 
