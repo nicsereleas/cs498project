@@ -61,6 +61,14 @@ function CalendarPage() {
 
         <div className="right-container">
           <h4>Here is what you have coming up in the next 7 days:</h4>
+          <div className="item-box">Item 1</div>
+          <div className="item-box">Item 2</div>
+          <div className="item-box">Item 3</div>
+          <div className="item-box">Item 4</div>
+          <div className="item-box">Item 5</div>
+          <div className="item-box">Item 6</div>
+          <div className="item-box">Item 7</div>
+          <div className="item-box">Item 8</div>
         </div>
       </div>
     </>
@@ -104,7 +112,7 @@ function FormPage() {
   return (
     <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
     <div className="form-container">
-      <h1>Sample Form</h1>
+      <h1 style={{textAlign: "center", textDecoration: "Underline"}}>Input A Bill or Chore:</h1>
       <form>
         <label>
           Chore or Bill:
