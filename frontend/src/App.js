@@ -9,15 +9,20 @@ const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalDay, setModalDay] = useState(null);
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth();
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  const handleClick = (day) => setSelectedDate(day);
-
+  const handleClick = (day) => {
+    setSelectedDate(day);
+    setModalDay(day);
+    setIsModalOpen(true);
+  };
+  
   const calendarDays = [];
 
   for (let i = 0; i < firstDay; i++) {
@@ -71,6 +76,21 @@ function CalendarPage() {
           <div className="item-box">Item 8</div>
         </div>
       </div>
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h3>Items Due on {today.toLocaleString("default", { month: "long" })} {modalDay}</h3>
+            <div className="modal-items">
+              <div className="modal-item">Example task</div>
+                <div className="modal-item">Another example</div>
+              </div>
+
+              <button className="close-button" onClick={() => {setIsModalOpen(false); setSelectedDate(null);}}>
+                Close
+              </button>
+            </div>
+          </div>
+          )}
     </>
   );
 }
