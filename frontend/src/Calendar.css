@@ -33,6 +33,21 @@
   padding: 0px 20px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   text-align: center;
+  overflow-y: auto;
+  height: calc(100vh - 120px);
+}
+
+.item-box {
+  background: white;
+  padding: 10px 10px;
+  margin: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  text-align: left;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  height: 50px;
+  width: 100%;
 }
 
 .weekdays {

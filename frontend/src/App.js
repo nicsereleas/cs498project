@@ -61,6 +61,14 @@ function CalendarPage() {
 
         <div className="right-container">
           <h4>Here is what you have coming up in the next 7 days:</h4>
+          <div className="item-box">Item 1</div>
+          <div className="item-box">Item 2</div>
+          <div className="item-box">Item 3</div>
+          <div className="item-box">Item 4</div>
+          <div className="item-box">Item 5</div>
+          <div className="item-box">Item 6</div>
+          <div className="item-box">Item 7</div>
+          <div className="item-box">Item 8</div>
         </div>
       </div>
     </>
@@ -71,6 +79,7 @@ function CalendarPage() {
 function FormPage() {
   const [type, setType] = useState("");
   const [name, setName] = useState("");
+  const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
 
     const handleSubmit = async (e) => {
@@ -93,6 +102,7 @@ function FormPage() {
       setType("");
       setName("");
       setNotes("");
+      setDate("");
 
     } catch (error) {
       console.error(error);
@@ -102,7 +112,7 @@ function FormPage() {
   return (
     <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
     <div className="form-container">
-      <h1>Sample Form</h1>
+      <h1 style={{textAlign: "center", textDecoration: "Underline"}}>Input A Bill or Chore:</h1>
       <form>
         <label>
           Chore or Bill:
@@ -123,7 +133,14 @@ function FormPage() {
             style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </label>
-
+        <label>
+          Due Date:
+          <input
+          type="date"
+          onChange={(e) => setDate(e.target.value)}
+          style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+          />
+        </label>
         <label>
           Notes:
           <textarea
