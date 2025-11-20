@@ -129,6 +129,7 @@ function FormPage() {
           Due Date:
           <input
           type="date"
+          onChange={(e) => setDate(e.target.value)}
           style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
           />
         </label>
