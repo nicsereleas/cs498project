@@ -3,16 +3,34 @@ import { Link } from "react-router-dom";
 import "./FunctionTracker.css";
 
 export default function FunctionTracker() {
-  // New data model: roommates, chores, bills
+  /**
+   * 🧠 DATA SOURCE OVERVIEW
+   *
+   * All data in this component should come from the backend, which is
+   * populated by the Input Form (FormPage).
+   *
+   * In a "real" app you'd:
+   *   - POST new roommates/chores/bills from the form page
+   *   - GET roommates/chores/bills here in FunctionTracker to display them
+   *
+   * Example (in real code, not shown here):
+   *   useEffect(() => {
+   *     fetch("/api/roommates").then(...setRoommates)
+   *     fetch("/api/chores").then(...setChores)
+   *     fetch("/api/bills").then(...setBills)
+   *   }, []);
+   */
 
-  // Replace with real data fetching in a real app
+  // ✅ In a real app, this array should come from a GET /roommates
+  //    (roommates are CREATED by POST /roommates from the input form)
   const [roommates, setRoommates] = useState([
     { id: 1, name: "Alex" },
     { id: 2, name: "Blake" },
     { id: 3, name: "Casey" },
   ]);
 
-  // Replace with real data fetching in a real app
+  // ✅ In a real app, this array should come from a GET /chores
+  //    (chores are CREATED by POST /chores from the input form)
   const [chores, setChores] = useState([
     {
       id: 101,
@@ -37,87 +55,67 @@ export default function FunctionTracker() {
     },
   ]);
 
-  // Replace with real data fetching in a real app
+  // ✅ In a real app, this array should come from a GET /bills
+  //    (bills are CREATED by POST /bills from the input form)
+  // Bills have: { id, title, amount, payerId }
   const [bills, setBills] = useState([
     {
       id: 201,
       title: "Electric",
       amount: 90.0,
       payerId: 1,
-      splitAmong: [1, 2, 3],
     },
     {
       id: 202,
       title: "Internet",
       amount: 60.0,
       payerId: 2,
-      splitAmong: [1, 2, 3],
     },
   ]);
 
+  // These derived arrays are computed locally from the fetched chores.
   const incomplete = chores.filter((c) => !c.completed);
   const completed = chores.filter((c) => c.completed);
 
+  /**
+   * ✅ UPDATE REQUEST (no creation here)
+   *
+   * This is the only "input" on the tracker page: marking a chore as complete.
+   * In a real app, this should fire an UPDATE/PATCH request:
+   *
+   *   PATCH /chores/:id  { completed: true }
+   *
+   * and then update local state with the new chore data.
+   *
+   * The chore itself is still originally CREATED from the input form via POST /chores.
+   */
   const markChoreComplete = (id) => {
+    // Local state update; in real code this should be synced with backend response
     setChores((list) =>
       list.map((c) => (c.id === id ? { ...c, completed: true } : c))
     );
   };
 
-  const addCompletedChore = () => {
-    const title = prompt("Completed chore title:");
-    if (!title) return;
-    const assigneeName = prompt("Assigned to (name):");
-    const dueInput = prompt("Due date (YYYY-MM-DD) - optional:");
-    const assignee = roommates.find(
-      (r) => r.name.toLowerCase() === (assigneeName || "").toLowerCase()
-    );
-    const assignedTo = assignee ? assignee.id : roommates[0]?.id || Date.now();
-    setChores((c) => [
-      ...c,
-      {
-        id: Date.now(),
-        title,
-        assignedTo,
-        completed: true,
-        dueDate: dueInput,
-      },
-    ]);
-  };
-
-  const addBill = () => {
-    const title = prompt("Bill title:");
-    const amount = parseFloat(prompt("Amount:"));
-    if (!title || isNaN(amount)) return;
-    const payerName = prompt("Payer name:");
-    const payer =
-      roommates.find(
-        (r) => r.name.toLowerCase() === (payerName || "").toLowerCase()
-      ) || roommates[0];
-    // by default split equally among all roommates
-    setBills((b) => [
-      ...b,
-      {
-        id: Date.now(),
-        title,
-        amount,
-        payerId: payer.id,
-        splitAmong: roommates.map((r) => r.id),
-      },
-    ]);
-  };
-
-  // compute per-roommate bill owed (they owe their share to payer)
+  /**
+   * ✅ SUMMARY CALCULATIONS
+   *
+   * Everything below is PURELY reading from:
+   *   - roommates (GET /roommates)
+   *   - bills (GET /bills)
+   *
+   * and computing per-roommate totals on the client.
+   */
+  // compute per-roommate bill owed (equal split among all roommates)
+  const roommateIds = roommates.map((r) => r.id);
   const billOwed = roommates.reduce((acc, r) => ({ ...acc, [r.id]: 0 }), {});
+
   bills.forEach((bill) => {
-    const members =
-      bill.splitAmong && bill.splitAmong.length
-        ? bill.splitAmong
-        : roommates.map((r) => r.id);
-    const per = Math.round((bill.amount / members.length) * 100) / 100;
-    members.forEach((mid) => {
-      if (mid === bill.payerId) return; // payer doesn't owe themself
-      billOwed[mid] = Math.round((billOwed[mid] + per) * 100) / 100;
+    if (roommateIds.length === 0) return;
+    const per = Math.round((bill.amount / roommateIds.length) * 100) / 100;
+
+    roommateIds.forEach((rid) => {
+      if (rid === bill.payerId) return; // payer doesn't owe themself
+      billOwed[rid] = Math.round((billOwed[rid] + per) * 100) / 100;
     });
   });
 
@@ -143,11 +141,9 @@ export default function FunctionTracker() {
           </div>
         </div>
         <div className="tracker-controls">
-          <button className="nav-button" onClick={addCompletedChore}>
-            Enter Completed Chore
-          </button>
+          {/* 🔗 Navigation only — all creation happens on the Input Form page */}
           <Link to="/form">
-            <button className="nav-button">Add Bill</button>
+            <button className="nav-button">Back to Input Form</button>
           </Link>
           <Link to="/">
             <button className="nav-button">Back to Calendar</button>
@@ -160,6 +156,7 @@ export default function FunctionTracker() {
           <div className="lists">
             <div className="list-box">
               <h3>Incomplete Chores</h3>
+              {/* ⬇️ Uses chores that were fetched via GET /chores */}
               {incomplete.length === 0 && <div>No incomplete chores</div>}
               {incomplete.map((c) => (
                 <div className="chore-item" key={c.id}>
@@ -167,6 +164,7 @@ export default function FunctionTracker() {
                     <strong>{c.title}</strong>
                     <div style={{ fontSize: 12, color: "#666" }}>
                       Assigned to:{" "}
+                      {/* ⬇️ Uses roommates that came from GET /roommates */}
                       {roommates.find((r) => r.id === c.assignedTo)?.name ||
                         "—"}
                     </div>
@@ -177,6 +175,7 @@ export default function FunctionTracker() {
                     )}
                   </div>
                   <div>
+                    {/* 🔽 This is the only mutating action here (PATCH /chores/:id in real app) */}
                     <button
                       className="small-btn"
                       onClick={() => markChoreComplete(c.id)}
@@ -190,6 +189,7 @@ export default function FunctionTracker() {
 
             <div className="list-box">
               <h3>Completed Chores</h3>
+              {/* ⬇️ Also relies on chores list from GET /chores */}
               {completed.length === 0 && <div>No completed chores yet</div>}
               {completed.map((c) => (
                 <div className="chore-item" key={c.id}>
@@ -213,6 +213,7 @@ export default function FunctionTracker() {
 
           <div style={{ marginTop: 12 }} className="list-box">
             <h3>Bills</h3>
+            {/* ⬇️ Uses bills from GET /bills and roommates from GET /roommates */}
             {bills.length === 0 && <div>No bills recorded</div>}
             {bills.map((b) => (
               <div className="chore-item" key={b.id}>
@@ -225,7 +226,11 @@ export default function FunctionTracker() {
                 </div>
                 <div style={{ fontSize: 13 }}>
                   Split: $
-                  {Math.round((b.amount / b.splitAmong.length) * 100) / 100}
+                  {roommates.length > 0
+                    ? (
+                        Math.round((b.amount / roommates.length) * 100) / 100
+                      ).toFixed(2)
+                    : "0.00"}
                 </div>
               </div>
             ))}
@@ -235,6 +240,7 @@ export default function FunctionTracker() {
         <div>
           <div className="list-box">
             <h3>Roommate Summary</h3>
+            {/* ⬇️ Summary depends on data from GET /roommates, GET /chores, GET /bills */}
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>
@@ -259,8 +265,8 @@ export default function FunctionTracker() {
         </div>
       </div>
       <p className="tracker-note">
-        Tip: Completed chores can be entered here; bills are split equally by
-        default.
+        Tip: This page only reads data created from the input form; bills are
+        split equally by default.
       </p>
     </div>
   );
