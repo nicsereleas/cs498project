@@ -3,9 +3,10 @@ import { Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import "./Calendar.css";
 import "./Form.css";
+import FunctionTracker from "./FunctionTracker";
+import "./FunctionTracker.css";
 
 const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
 
 function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState(null);
@@ -46,10 +47,14 @@ function CalendarPage() {
       <div className="top-container">
         <h2 className="chores">Chores Left:</h2>
         <h2 className="bills">Bills Left:</h2>
-        <h3 className="top-link"><Link to="/form">
+        <h3 className="top-link">
+          <Link to="/form">
             <button className="nav-button">Add a Bill or Chore</button>
           </Link>
-          </h3>
+          <Link to="/tracker">
+            <button className="nav-button">Function Tracker</button>
+          </Link>
+        </h3>
       </div>
       <div className="bottom-container">
         <div className="calendar-container">
@@ -58,12 +63,13 @@ function CalendarPage() {
           </h2>
           <div className="weekdays">
             {daysOfWeek.map((d) => (
-              <div key={d} className="weekday">{d}</div>
+              <div key={d} className="weekday">
+                {d}
+              </div>
             ))}
           </div>
           <div className="calendar-grid">{calendarDays}</div>
         </div>
-
         <div className="right-container">
           <h4>Here is what you have coming up in the next 7 days:</h4>
           <div className="item-box">Item 1</div>
@@ -95,14 +101,13 @@ function CalendarPage() {
   );
 }
 
-
 function FormPage() {
   const [type, setType] = useState("");
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
   const [notes, setNotes] = useState("");
 
-    const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const data = { type, name, notes };
@@ -123,68 +128,79 @@ function FormPage() {
       setName("");
       setNotes("");
       setDate("");
-
     } catch (error) {
       console.error(error);
       alert("Error submitting form");
     }
   };
   return (
-    <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-    <div className="form-container">
-      <h1 style={{textAlign: "center", textDecoration: "Underline"}}>Input A Bill or Chore:</h1>
-      <form>
-        <label>
-          Chore or Bill:
-          <select defaultValue="" style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}>
-            <option value="" disabled>Select Bill or Chore
-            </option>
-            <option value="chore">Chore</option>
-            <option value="bill">Bill</option>
-          </select>
-        </label>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={name}
-            placeholder="Name of Bill/Chore"
-            onChange={(e) => setName(e.target.value)}
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </label>
-        <label>
-          Due Date:
-          <input
-          type="date"
-          onChange={(e) => setDate(e.target.value)}
-          style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </label>
-        <label>
-          Notes:
-          <textarea
-            value={notes}
-            placeholder="Anything you want to add"
-            onChange={(e) => setNotes(e.target.value)}
-            style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
-          />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-      <Link to="/">
-        <button className="nav-button">Back to Calendar</button>
-      </Link>
-    </div>
+    <div
+      style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+    >
+      <div className="form-container">
+        <h1 style={{ textAlign: "center", textDecoration: "Underline" }}>
+          Input A Bill or Chore:
+        </h1>
+        <form>
+          <label>
+            Chore or Bill:
+            <select
+              defaultValue=""
+              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            >
+              <option value="" disabled>
+                Select Bill or Chore
+              </option>
+              <option value="chore">Chore</option>
+              <option value="bill">Bill</option>
+            </select>
+          </label>
+          <label>
+            Name:
+            <input
+              type="text"
+              value={name}
+              placeholder="Name of Bill/Chore"
+              onChange={(e) => setName(e.target.value)}
+              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            />
+          </label>
+          <label>
+            Due Date:
+            <input
+              type="date"
+              onChange={(e) => setDate(e.target.value)}
+              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            />
+          </label>
+          <label>
+            Notes:
+            <textarea
+              value={notes}
+              placeholder="Anything you want to add"
+              onChange={(e) => setNotes(e.target.value)}
+              style={{ width: "100%", padding: "8px", boxSizing: "border-box" }}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
+        <Link to="/">
+          <button className="nav-button">Back to Calendar</button>
+        </Link>
+      </div>
     </div>
   );
 }
 
+function Tracker() {
+  return <div></div>;
+}
 function App() {
   return (
     <Routes>
       <Route path="/" element={<CalendarPage />} />
       <Route path="/form" element={<FormPage />} />
+      <Route path="/tracker" element={<FunctionTracker />} />
     </Routes>
   );
 }
