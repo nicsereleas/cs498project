@@ -3,13 +3,16 @@ import Chore from "../models/Chore.js";
 //add a new chore
 export const addChore = async (req, res) => {
   try {
-    const { name, assignedTo, dueDate } = req.body;
-    const chore = await Chore.create({ name, assignedTo, dueDate });
+    const { name, assignedTo, dueDate, notes } = req.body;
+    // ensure assignedTo is stored as array of ObjectIds
+    const assigned = Array.isArray(assignedTo) ? assignedTo : assignedTo ? [assignedTo] : [];
+    const chore = await Chore.create({ name, assignedTo: assigned, dueDate, notes });
     res.status(201).json(chore);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 //mark chore as done
 export const markChoreDone = async (req, res) => {

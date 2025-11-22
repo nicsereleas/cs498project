@@ -4,6 +4,7 @@ const billSchema = new mongoose.Schema({
   description: { type: String, required: true },
   amount: { type: Number, required: true },
   dueDate: { type: Date, required: true },
+  payerId: { type: mongoose.Schema.Types.ObjectId, ref: "Roommate", required: true },
   splits: [
     {
       roommate: { type: mongoose.Schema.Types.ObjectId, ref: "Roommate" },
